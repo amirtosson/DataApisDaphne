@@ -4,7 +4,8 @@ const base64url = require('base64url');
 
 function GenerateNewToken(user){ 
     var stringifiedData = CryptoJS.enc.Utf8.parse(JSON.stringify(user));
-    return base64url(stringifiedData.toString());    
+    var token = base64url(stringifiedData.toString())
+    return token.substr(0,100);    
 }
 
 module.exports = {GenerateNewToken}

@@ -17,8 +17,13 @@ app.use(bodyparser.urlencoded({
 // Importing routers 
 const userRouter = require('./routers/user.routers');
 const datasetsRouter = require('./routers/datasets.routers');
+const projectsRouter = require('./routers/projects.routers');
+const generalRouter = require('./routers/general.routers');
+
 
 app.use(userRouter);
-//app.use(datasetsRouter);
+app.use(projectsRouter);
+app.use(generalRouter);
+app.use(datasetsRouter);
 
 app.listen(3050, () => console.log(`Dataseets APIs listening on port 3050!`));
