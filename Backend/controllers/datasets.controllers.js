@@ -91,7 +91,7 @@ function GetDataFeomFiles(path) {
 
 
 function GetAttachedFilesByDatasetDoi(req,res){
-    var query = "SELECT dataset_doi, added_on, login_name, attached_file_name, added_on, added_by  FROM  attached_files_list"+ 
+    var query = "SELECT added_on, login_name, attached_file_name, added_on, added_by, attached_file_type_id  FROM  attached_files_list"+ 
     " INNER JOIN users ON users.user_id = attached_files_list.added_by " +
     " WHERE attached_files_list.dataset_doi = " +"\""+req.headers.dataset_doi + "\""+ ";" 
     
@@ -255,8 +255,8 @@ function AddDatasetActivity(req,res){
     try 
     {
         con.query(query, function (err, result) {
-            if (err) throw err;
-            if (result[0] === undefined ) {
+            if (err)
+            {
                 res.status(404)
                 res.json(
                     { 
@@ -265,6 +265,7 @@ function AddDatasetActivity(req,res){
                 );
             } 
             else {
+                res.status(200)
                 res.json(result)
             }
         })

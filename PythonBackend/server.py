@@ -6,7 +6,7 @@ Created on Fri Feb 25 11:57:24 2022
 import json
 from flask import Flask, jsonify,Response, json, request
 from flask_cors import CORS, cross_origin
-
+import json
 import numpy as np
 import sys
 import logging
@@ -16,7 +16,7 @@ import csv
 import numpy as np
 import pandas as pd
 import pymongo
-
+import mysql.connector
 import pymongo
 
 mongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -94,10 +94,28 @@ def upload_file():
 def read_attached_files():
     dataset_doi = request.headers.get('dataset_doi')
     file_all = []
-    for name in glob.glob(datasets_attached_files_dir + dataset_doi+'_atta_*'):
+    json_all = []
+    daphnedb = mysql.connector.connect(
+        user="root",
+        password= "26472647",
+        database= "daphne"
+        )
+    files_name = glob.glob(datasets_attached_files_dir + dataset_doi+'_atta_*')
+    if len(files_name) == 0: 
+        return jsonify({"MSG":"no files"})
+    for name in files_name:
         f = open(name, "r")
-        file_all.append(f.read())
-    return  jsonify({"data":file_all})
+        name_file = name.split("_")[5]
+        print(name_file)
+        _cursor = daphnedb.cursor()
+        query = "SELECT added_on, login_name, attached_file_name, added_by, attached_file_type_id  FROM  attached_files_list INNER JOIN users ON users.user_id = attached_files_list.added_by WHERE attached_files_list.attached_file_name= " + '"'+ name_file+ '"' 
+        _cursor.execute(query)
+        file_details=_cursor.fetchone()
+        x = f.read()
+        dictionary = {'data':x,'added_on':str(file_details[0]), 'login_name':file_details[1], 'attached_file_name':file_details[2], 'added_by':file_details[3], 'attached_file_type_id':file_details[4]}
+        json_all.append(dictionary)
+        
+    return  jsonify({"files":json_all})
 
 
 if __name__ == '__main__':
